@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timer</title>
+  <meta name="theme-color" content="#0A74DA" />
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #111;
+      color: white;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+    }
+    button {
+      background: #0A74DA;
+      color: white;
+      font-size: 2em;
+      padding: 20px 40px;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+    #time {
+      font-size: 3em;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <button id="startBtn">Start 3-Min Timer</button>
+  <div id="time">03:00</div>
+
+  <script>
+    const btn = document.getElementById("startBtn");
+    const timeDisplay = document.getElementById("time");
+    let timer;
+    let remaining = 180;
+
+    function updateDisplay() {
+      const m = Math.floor(remaining / 60);
+      const s = remaining % 60;
+      timeDisplay.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function beep() {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 800;
+      gain.gain.value = 0.2;
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+    }
+
+    btn.addEventListener("click", () => {
+      clearInterval(timer);
+      remaining = 180;
+      updateDisplay();
+      btn.disabled = true;
+      btn.textContent = "Running...";
+      timer = setInterval(() => {
+        remaining--;
+        updateDisplay();
+        if (remaining <= 0) {
+          clearInterval(timer);
+          beep();
+          btn.disabled = false;
+          btn.textContent = "Start Again";
+        }
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

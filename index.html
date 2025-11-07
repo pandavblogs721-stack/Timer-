@@ -44,6 +44,7 @@
   let timer;
   let remaining = 180;
 
+  // Create Reset button
   const resetBtn = document.createElement("button");
   resetBtn.textContent = "Reset";
   resetBtn.style.background = "#555";
@@ -56,31 +57,37 @@
   resetBtn.style.cursor = "pointer";
   document.body.appendChild(resetBtn);
 
+  // Update display
   function updateDisplay() {
     const m = Math.floor(remaining / 60);
     const s = remaining % 60;
     timeDisplay.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   }
 
+  // Beep function (double beep)
   function beep() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-
     function singleBeep(delay) {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.frequency.value = 800; // tone pitch
+      osc.frequency.value = 800;
       gain.gain.value = 0.2;
       osc.start(ctx.currentTime + delay);
       osc.stop(ctx.currentTime + delay + 0.4);
     }
-
-    // Two beeps: one immediately, one after 0.6 seconds
     singleBeep(0);
     singleBeep(0.6);
   }
 
+  // Custom sound for early reset
+  function playEarlyResetSound() {
+    const audio = new Audio('ye-aagya-range-mei-etr-c7fwug_4gA9PLtT.mp3'); // <-- add this file in your repo
+    audio.play();
+  }
+
+  // Start timer
   function startTimer() {
     clearInterval(timer);
     remaining = 180;
@@ -99,7 +106,13 @@
     }, 1000);
   }
 
+  // Reset timer
   function resetTimer() {
+    // if reset before 1m30s (remaining > 90)
+    if (remaining > 90) {
+      playEarlyResetSound();
+    }
+
     clearInterval(timer);
     remaining = 180;
     updateDisplay();
@@ -111,7 +124,6 @@
   resetBtn.addEventListener("click", resetTimer);
 
   updateDisplay();
-  </script>
-  
+</script>
 </body>
 </html>
